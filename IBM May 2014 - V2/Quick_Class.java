@@ -1,0 +1,36 @@
+import java.util.Random;
+
+public class Quick_Class
+{
+  private static Random random = new Random();
+  
+  public static double randomInRange(double min, double max) 
+  {
+    double range = max - min;
+    double scaled = random.nextDouble() * range;
+    double shifted = scaled + min;
+    return shifted; // == (rand.nextDouble() * (max-min)) + min;
+  }
+  
+  public static void main(String[] args)
+  {
+    long num_samples = 0L;
+    long num_valid_samples = 0L;
+    
+    Boolean done = false;
+    while (!done)
+    {     
+      double a = randomInRange(0, 1);
+      double b = randomInRange(0, 1);
+      double c = randomInRange(0, 1);
+      double d = randomInRange(0, 1);
+      
+      if (d > a && c > b && (((b*d) + (2*a*b)) < (3*a*c)))
+        num_valid_samples++;
+      num_samples++;
+      
+      if (num_samples % 10000000 == 0)
+        System.out.println("Trial #" + num_samples + ": " + ((double) num_valid_samples / num_samples) + " " + num_valid_samples); 
+    }
+  }  
+}

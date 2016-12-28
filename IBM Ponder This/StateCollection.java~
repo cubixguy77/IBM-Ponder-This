@@ -1,0 +1,24 @@
+
+public class StateCollection
+{
+  ArrayList<State> list;
+  
+  public static ArrayList<State> getNextRoundStates(State state)
+  {
+    ArrayList<State> states = new ArrayList<State>();
+    if (state.finished())
+    {
+      return states;
+    }
+    
+    // choose a
+    
+    
+    
+  }
+  
+  
+  
+  
+  
+}
