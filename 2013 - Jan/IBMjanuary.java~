@@ -1,0 +1,89 @@
+
+public class IBMjanuary {
+  
+  private static int numRows = 6;
+  private static int stringLen = 6;
+  private static int numCols = ((stringLen * (stringLen - 1) * (stringLen - 2)) / 6);
+  private static String[] classArray; 
+  
+  public static void print(int[][] array)
+  {
+    for (int row=0; row<numRows; row++) {
+      for (int col=0; col<numCols; col++) {
+        System.out.print("| " + array[row][col] + " | ");
+      }
+      System.out.println();
+      for (int colb=0; colb<numCols; colb++)
+        System.out.print("-----");
+      System.out.println();
+    }
+  }
+  
+  public static int mint(char c)
+  {
+    return Character.getNumericValue(c);
+  }
+  
+  public static int getRankByThreeCharacterCombo(int a, int b, int c)
+  {
+    if (a < b && b < c) return 0; // abc
+    if (a < b && b > c && c > a) return 1; // acb
+    if (a > b && b < c && a < c) return 2; // bac
+    if (a > b && b < c && a > c) return 3; // bca
+    if (a < b && b > c && c < a) return 4; // cab
+    if (a > b && b > c) return 5; // cba
+    return -1;
+  }
+  
+  public static int getClassByThreeCharacterCombo(int a, int b, int c)
+  {
+    for (int i=0; i<classArray.length; i++) {
+      if (classArray[i].indexOf(a) != -1 && classArray[i].indexOf(b) != -1 && classArray[i].indexOf(c) != -1)
+        return i;
+    }
+    return -1;
+  }
+  
+  public static int[][] getUpdatedArrayByPermutation(String perm, int[][] array)
+  {
+    for (int a=0; a<stringLen-2; a++) {
+      for (int b=1; b<stringLen-1; b++) {
+        for (int c=2; c<stringLen;   c++) {
+          int x = mint(perm.charAt(a));
+          int y = mint(perm.charAt(b));
+          int z = mint(perm.charAt(c));
+          int row = getRankByThreeCharacterCombo(x, y, z);
+          int col = getClassByThreeCharacterCombo(perm.charAt(a), perm.charAt(b), perm.charAt(c));
+          array[row][col]++;
+        }
+      }
+    }
+    return array;
+  }
+  
+  public static void loadClassArray()
+  {
+    classArray = new String[numCols];
+    int i=0;
+    for (int a=1; a<=stringLen-2; a++) {
+      for (int b=a+1; b<=stringLen-1; b++) {
+        for (int c=b+1; c<=stringLen;   c++) {
+          String s = Integer.toString(a) + Integer.toString(b) + Integer.toString(c);
+          classArray[i] = s;
+          i++;
+        }
+      }
+    }
+  }
+  
+  public static void main(String[] args) 
+  {
+    int[][] array = new int[numRows][numCols];
+    loadClassArray();
+   // print(array);
+    for (int i=0; i<numCols; i++) {
+      System.out.println(i + " " + classArray[i]);
+    }
+  }
+  
+}

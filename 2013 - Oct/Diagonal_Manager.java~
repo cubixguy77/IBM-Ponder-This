@@ -1,0 +1,20 @@
+
+
+public class Diagonal_Manager 
+{
+  
+  public Diagonal[] diags;
+  
+  public Diagonal_Manager()
+  {
+    diags = new int[30];
+    for (int i=0; i<30; i++)
+    {
+      diags[i] = new Diagonal(i);
+    }
+    
+  }
+  
+  
+  
+}

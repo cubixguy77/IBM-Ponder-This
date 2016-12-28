@@ -1,0 +1,219 @@
+import java.util.*;
+
+public class IBM_August
+{
+
+  
+  public static int[] vertex;
+  public static int numNodes = 512;
+  public static int dim = 9;
+  public static int numChars = 32;
+  public static int targetSize = ((dim * (dim + 1)) / 2); // 45
+  public static int targetTotalCount = numChars * numNodes; // 16384
+  public static Set<Integer> numbers;
+  public static int[][] charcount;
+  public static int total = 0;
+  
+  public static void updateCharCount(int v, int val, int change)
+  {
+    charcount[v][val] += change;
+  }
+  
+  public static int getTwoHopCount(int v)
+  {
+    Set<Integer> numbers = new HashSet<Integer>();
+    numbers.add(vertex[v]);
+    updateCharCount(v, vertex[v], 1);
+    for (int i=0; i<dim; i++)
+    {
+      int neighbor = flipbit(v, i);
+      numbers.add(vertex[neighbor]);
+      updateCharCount(v, vertex[neighbor], 1);
+      
+      for (int j=i+1; j<dim; j++)
+      {
+        if (j != i && j < vertex.length)
+        {
+          int neighbor2 = flipbit(neighbor, j);
+          numbers.add(vertex[neighbor2]);
+          charcount[v][vertex[neighbor2]]++;
+          updateCharCount(v, vertex[neighbor2], 1);          
+        }
+      }
+    }
+    return numbers.size();
+  }
+  
+  public static int flipbit(int binary, int index)
+  {
+    if (((binary >> index) & 1) == 0)
+      return binary + (int) Math.pow(2, index);
+    else
+      return binary - (int) Math.pow(2, index);
+  }
+  
+  public static int getTotalCount()
+  {
+    int total = 0;
+    for (int i=0; i<vertex.length; i++)
+    {
+      total += getTwoHopCount(i);
+    }
+    return total;
+  }
+  public static double getAverageCount()
+  {
+    int total = 0;
+    for (int i=0; i<vertex.length; i++)
+    {
+      total += getTwoHopCount(i);
+    }
+    return (double) total / vertex.length;
+  }
+  
+  public static void initialize()
+  {
+    Random random = new Random();
+    for (int i=0; i<vertex.length; i++)
+    {
+      vertex[i] = random.nextInt(numChars);
+    }
+  }
+  
+  public static int makeGoodSwap(int startCount)
+  {
+    Random random = new Random();
+    int a, b, temp;
+    Boolean done = false;
+    int resultCount = 0;
+    while (!done) 
+    {
+      a = random.nextInt(numNodes);
+      b = random.nextInt(numNodes);
+      temp = vertex[a];
+      vertex[a] = vertex[b];
+      vertex[b] = temp;
+      resultCount = getTotalCount();
+      if (resultCount > startCount)
+      {
+        done = true;
+        System.out.println("Flipped " + vertex[a] + " " + vertex[b]);
+      }
+      else
+      {
+        temp = vertex[a];
+        vertex[a] = vertex[b];
+        vertex[b] = temp;
+      }
+    }
+    System.out.println(resultCount);
+    //System.out.println(getAverageCount());
+    return resultCount;
+  }
+  
+  public static int HighToLow(int v)
+  {
+    int numzeros = 0;
+    int maxindex=0, minindex=0, maxval=0;
+    for (int i=0; i<numChars; i++)
+    {
+      if (charcount[v][i] > maxval)
+      {
+        maxval = charcount[v][i];
+        maxindex = i;
+      }
+      else if (charcount[v][i] == 0)
+      {
+        numzeros++;
+        minindex = i;
+      }
+    }
+    if (numzeros == 0)
+    {
+      System.out.println("No Action at index " + v);
+      return -1;
+    }
+    
+    int maxchar = charcount[v][maxindex];
+    int minchar = charcount[v][minindex];
+    Boolean done = false;
+    // the indexes refer to the character, from 0-31;
+    // minindex = 'C', this is the value we want to assign to a vertex which has the max value, 'B'
+    // so find a vertex within the neighborhood with the max value and reassign it
+    for (int i=0; i<dim; i++)
+    {
+      int neighbor = flipbit(v, i);
+      if (vertex[neighbor] == maxchar)
+      {
+        vertex[neighbor] = minchar;
+        System.out.println("Set node " + neighbor + " to " + minchar);
+        done = true;
+        break;
+      }
+      for (int j=i+1; j<dim; j++)
+      {
+        if (j != i && j < vertex.length)
+        {
+          int neighbor2 = flipbit(neighbor, j);
+          if (vertex[neighbor2] == maxchar)
+          {
+            vertex[neighbor2] = minchar;
+            System.out.println("Set node " + neighbor2 + " to " + minchar);
+            done = true;
+            break;
+          }
+        }
+      }
+      if (done)
+        break;
+    }
+    int result = getTotalCount();
+    System.out.println(result);
+    //System.out.println(getAverageCount());
+    return result;
+  }
+  
+  public static void print()
+  {
+    for (int i=0; i<vertex.length; i++)
+    {
+      System.out.println(vertex[i]);
+    }
+  }
+  
+  public static void printprint()
+  {
+    for (int i=0; i<vertex.length; i++)
+    {
+      System.out.println("=========================");
+      System.out.println("Node: " + vertex[i]);
+      for (int j=0; j<numChars; j++)
+        System.out.println(j + ": " + charcount[i][j]);
+      System.out.println("=========================");
+    }
+  }
+  
+  public static void main(String[] args)
+  {
+    vertex = new int[numNodes];
+    numbers = new HashSet<Integer>();
+    charcount = new int[numNodes][numChars];
+    initialize();
+
+   // System.out.println(getTwoHopCount(0) + " " + targetSize);
+   
+    int total = getTotalCount();
+    // printprint();
+    System.out.println(total);
+    System.out.println(getAverageCount());
+    
+    while (total < targetTotalCount)
+    {
+      //total = makeGoodSwap(getTotalCount());
+      for (int i=0; i<vertex.length; i++)
+        total = HighToLow(i);
+    }
+    System.out.println("OMISDFOIJMSDF");
+    print();
+  }  
+}
